@@ -6,7 +6,7 @@ Before interacting with the databases, you must first create the environment var
 
 Run npm install 
 
-Ensure that you have dotenv installed locally in the package.json file 
+Ensure that you have dotenv installed.
 
 create two new files:
 
