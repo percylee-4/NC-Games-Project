@@ -73,7 +73,7 @@ describe("/api/", () => {
   });
 });
 describe("/api/users", () => {
-  test("200: returns an array of user objects with the correct keys", () => {
+  test("200: returns an array of user objects", () => {
     return request(app)
       .get("/api/users")
       .expect(200)
