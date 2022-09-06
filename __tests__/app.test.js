@@ -35,19 +35,18 @@ describe("/api/", () => {
           .get("/api/reviews/1")
           .expect(200)
           .then((response) => {
-            const reviews = response.body.reviews;
-            expect(reviews.length === 1).toBe(true);
-            reviews.forEach((review) => {
-              expect(review.hasOwnProperty("review_id")).toBe(true);
-              expect(review.hasOwnProperty("title")).toBe(true);
-              expect(review.hasOwnProperty("review_body")).toBe(true);
-              expect(review.hasOwnProperty("designer")).toBe(true);
-              expect(review.hasOwnProperty("review_img_url")).toBe(true);
-              expect(review.hasOwnProperty("votes")).toBe(true);
-              expect(review.hasOwnProperty("category")).toBe(true);
-              expect(review.hasOwnProperty("owner")).toBe(true);
-              expect(review.hasOwnProperty("created_at")).toBe(true);
-            });
+            const review = response.body.review;
+            expect(review.review_id).toBe(1);
+            expect(review.title).toBe("Agricola");
+            expect(review.category).toBe("euro game");
+            expect(review.designer).toBe("Uwe Rosenberg");
+            expect(review.owner).toBe("mallionaire");
+            expect(review.review_body).toBe("Farmyard fun!");
+            expect(review.review_img_url).toBe(
+              "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+            );
+            expect(review.created_at).toBe("2021-01-18T10:00:20.514Z");
+            expect(review.votes).toBe(1);
           });
       });
       test("404: responds with a 404 status code and an error message when passed an id that does not exist", () => {
@@ -62,12 +61,14 @@ describe("/api/", () => {
       });
       test("400: responds with a 400 status code and an error message when passed an invalid user id datatype", () => {
         return request(app)
-        .get("/api/reviews/false")
-        .expect(400)
-        .then((response) => {
-          expect(response.body.message).toBe("Invalid id provided, a review id must be a number.")
-        })
-      })
+          .get("/api/reviews/false")
+          .expect(400)
+          .then((response) => {
+            expect(response.body.message).toBe(
+              "Invalid id provided, a review id must be a number."
+            );
+          });
+      });
     });
   });
 });
