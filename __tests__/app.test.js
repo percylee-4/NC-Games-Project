@@ -72,6 +72,23 @@ describe("/api/", () => {
     });
   });
 });
+describe("/api/users", () => {
+  test("200: returns an array of user objects", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then((response) => {
+        const users = response.body.users;
+        expect(users.length === 4).toBe(true);
+        users.forEach((user) => {
+          expect(user.hasOwnProperty("username")).toBe(true);
+          expect(user.hasOwnProperty("name")).toBe(true);
+          expect(user.hasOwnProperty("avatar_url")).toBe(true);
+        });
+      });
+  });
+});
+
 describe("404: mispelt url path", () => {
   test("404: returns an error message when passed an invalid url path", () => {
     return request(app)
