@@ -3,7 +3,7 @@ const { selectReview, updateReviewVotes } = require("../models/reviews.models");
 exports.getReview = (req, res, next) => {
   const id = req.params.review_id;
   selectReview(id)
-    .then(([review]) => {
+    .then((review) => {
       res.status(200).send({ review: review });
     })
     .catch((err) => {
