@@ -60,6 +60,14 @@ describe("/api/", () => {
             );
           });
       });
+      test("400: responds with a 400 status code and an error message when passed an invalid user id datatype", () => {
+        return request(app)
+        .get("/api/reviews/false")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.message).toBe("Invalid id provided, a review id must be a number.")
+        })
+      })
     });
   });
 });
