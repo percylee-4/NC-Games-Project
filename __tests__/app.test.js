@@ -112,7 +112,7 @@ describe("/api/", () => {
       test("400: responds with an error message when passed incorrect datatypes", () => {
         const incorrectData = { inc_votes: false };
         return request(app)
-          .patch("/api/reviews/999")
+          .patch("/api/reviews/1")
           .send(incorrectData)
           .expect(400)
           .then((response) => {
