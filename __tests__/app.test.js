@@ -69,6 +69,58 @@ describe("/api/", () => {
             );
           });
       });
+      test("201:, responds with the updated review containing an incremented vote count", () => {
+        const incrementer = { inc_votes: 20 };
+        return request(app)
+          .patch("/api/reviews/1")
+          .send(incrementer)
+          .expect(201)
+          .then((response) => {
+            const review = response.body.review;
+            expect(review.hasOwnProperty("review_id")).toBe(true);
+            expect(review.hasOwnProperty("title")).toBe(true);
+            expect(review.hasOwnProperty("review_body")).toBe(true);
+            expect(review.hasOwnProperty("designer")).toBe(true);
+            expect(review.hasOwnProperty("review_img_url")).toBe(true);
+            expect(review.hasOwnProperty("votes")).toBe(true);
+            expect(review.hasOwnProperty("category")).toBe(true);
+            expect(review.hasOwnProperty("owner")).toBe(true);
+            expect(review.hasOwnProperty("created_at")).toBe(true);
+            expect(review.votes).toBe(21);
+          });
+      });
+      test("201:, responds with the updated review containing a decremented vote count", () => {
+        const decrementer = { inc_votes: -20 };
+        return request(app)
+          .patch("/api/reviews/1")
+          .send(decrementer)
+          .expect(201)
+          .then((response) => {
+            const review = response.body.review;
+            expect(review.hasOwnProperty("review_id")).toBe(true);
+            expect(review.hasOwnProperty("title")).toBe(true);
+            expect(review.hasOwnProperty("review_body")).toBe(true);
+            expect(review.hasOwnProperty("designer")).toBe(true);
+            expect(review.hasOwnProperty("review_img_url")).toBe(true);
+            expect(review.hasOwnProperty("votes")).toBe(true);
+            expect(review.hasOwnProperty("category")).toBe(true);
+            expect(review.hasOwnProperty("owner")).toBe(true);
+            expect(review.hasOwnProperty("created_at")).toBe(true);
+            expect(review.votes).toBe(-19);
+          });
+      });
+      test("400: responds with an error message when passed incorrect datatypes", () => {
+        const incorrectData = { inc_votes: false };
+        return request(app)
+          .patch("/api/reviews/1")
+          .send(incorrectData)
+          .expect(400)
+          .then((response) => {
+            expect(response.body.message).toBe(
+              "Invalid id or vote count provided, these must be a number."
+            );
+          });
+      });
     });
   });
 });
