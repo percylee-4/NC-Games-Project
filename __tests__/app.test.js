@@ -30,7 +30,7 @@ describe("/api/", () => {
   });
   describe("/api/reviews", () => {
     describe("/api/reviews/:review_id", () => {
-      test("200: responds with a review object matching the passed id", () => {
+      test("200: responds with a review object matching the passed id with a comment count property added", () => {
         return request(app)
           .get("/api/reviews/1")
           .expect(200)
@@ -47,8 +47,20 @@ describe("/api/", () => {
             );
             expect(review.created_at).toBe("2021-01-18T10:00:20.514Z");
             expect(review.votes).toBe(1);
+            expect(review.comment_count).toBe("0");
           });
       });
+      test("200: responds with a review object with comment_count when there are comments to add", () => {
+        return request(app)
+          .get("/api/reviews/2")
+          .expect(200)
+          .then((response) => {
+            const review = response.body.review;
+            expect(review.review_id).toBe(2);
+            expect(review.comment_count).toBe("3");
+          });
+      });
+
       test("404: responds with a 404 status code and an error message when passed an id that does not exist", () => {
         return request(app)
           .get("/api/reviews/999")

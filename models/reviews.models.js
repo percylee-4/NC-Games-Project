@@ -4,13 +4,24 @@ exports.selectReview = (id) => {
   return db
     .query(`SELECT * FROM reviews WHERE review_id = $1`, [id])
     .then((reviews) => {
-      if (reviews.rows.length > 0) {
-        return reviews.rows;
-      } else {
+      if (reviews.rows.length === 0) {
         return Promise.reject({
           status: 404,
           message: "Sorry, there is no review with that id. Please try again.",
         });
+      } else {
+        return db
+          .query(
+            `SELECT reviews.*, COUNT(comments.review_id) AS comment_count
+          FROM reviews
+          LEFT JOIN comments ON comments.review_id = reviews.review_id
+          WHERE reviews.review_id = $1
+          GROUP BY comments.review_id, reviews.review_id`,
+            [id]
+          )
+          .then((review) => {
+            return review.rows;
+          });
       }
     });
 };
