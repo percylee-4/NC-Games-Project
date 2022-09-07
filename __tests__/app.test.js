@@ -47,7 +47,7 @@ describe("/api/", () => {
             );
             expect(review.created_at).toBe("2021-01-18T10:00:20.514Z");
             expect(review.votes).toBe(1);
-            expect(review.comment_count).toBe(0);
+            expect(review.comment_count).toBe("0");
           });
       });
       test("200: responds with a review object with comment_count when there are comments to add", () => {
@@ -57,7 +57,7 @@ describe("/api/", () => {
           .then((response) => {
             const review = response.body.review;
             expect(review.review_id).toBe(2);
-            expect(review.comment_count).toBe(3);
+            expect(review.comment_count).toBe("3");
           });
       });
 

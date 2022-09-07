@@ -11,15 +11,16 @@ exports.selectReview = (id) => {
         });
       } else {
         return db
-          .query(`SELECT * FROM comments WHERE review_id = $1`, [id])
-          .then((comments) => {
-            return comments.rows.length;
-          })
-          .then((commentNumber) => {
-            const review = { ...reviews.rows[0] };
-
-            review.comment_count = commentNumber;
-            return review;
+          .query(
+            `SELECT reviews.*, COUNT(comments.review_id) AS comment_count
+          FROM reviews
+          LEFT JOIN comments ON comments.review_id = reviews.review_id
+          WHERE reviews.review_id = $1
+          GROUP BY comments.review_id, reviews.review_id`,
+            [id]
+          )
+          .then((review) => {
+            return review.rows;
           });
       }
     });
