@@ -2,6 +2,7 @@ const {
   selectReview,
   updateReviewVotes,
   selectReviews,
+  selectComments,
 } = require("../models/reviews.models");
 
 exports.getReview = (req, res, next) => {
@@ -42,10 +43,28 @@ exports.patchReviewVotes = (req, res, next) => {
 exports.getReviews = (req, res, next) => {
   const query = req.query.category;
   selectReviews(query)
-    .then(( reviews ) => {
-      res.status(200).send({reviews: reviews});
+    .then((reviews) => {
+      res.status(200).send({ reviews: reviews });
     })
     .catch((err) => {
       next(err);
+    });
+};
+
+exports.getComments = (req, res, next) => {
+  const id = req.params.review_id;
+  selectComments(id)
+    .then((comments) => {
+      res.status(200).send({comments: comments});
+    })
+    .catch((err) => {
+      if (err.code === "22P02") {
+        next({
+          status: 400,
+          message: "Invalid id provided, a review id must be a number.",
+        });
+      } else {
+        next(err);
+      }
     });
 };

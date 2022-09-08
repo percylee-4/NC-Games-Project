@@ -3,6 +3,7 @@ const {
   getReview,
   patchReviewVotes,
   getReviews,
+  getComments,
 } = require("./Controllers/reviews.controllers");
 
 const express = require("express");
@@ -17,6 +18,8 @@ app.get("/api/categories", getCategories);
 app.get("/api/reviews?:query", getReviews);
 
 app.get("/api/reviews/:review_id", getReview);
+
+app.get("/api/reviews/:review_id/comments", getComments);
 
 app.get("/api/users", getUsers);
 
