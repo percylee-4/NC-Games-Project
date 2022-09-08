@@ -1,4 +1,8 @@
-const { selectReview, updateReviewVotes } = require("../models/reviews.models");
+const {
+  selectReview,
+  updateReviewVotes,
+  selectReviews,
+} = require("../models/reviews.models");
 
 exports.getReview = (req, res, next) => {
   const id = req.params.review_id;
@@ -31,6 +35,17 @@ exports.patchReviewVotes = (req, res, next) => {
           message: "Invalid id or vote count provided, these must be a number.",
         });
       }
+      next(err);
+    });
+};
+
+exports.getReviews = (req, res, next) => {
+  const query = req.query.category;
+  selectReviews(query)
+    .then(( reviews ) => {
+      res.status(200).send({reviews: reviews});
+    })
+    .catch((err) => {
       next(err);
     });
 };
