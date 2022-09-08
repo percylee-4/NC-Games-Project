@@ -1,20 +1,26 @@
 const { getCategories } = require("./Controllers/categories.controller");
-const { getReview, patchReviewVotes } = require("./Controllers/reviews.controllers");
+const {
+  getReview,
+  patchReviewVotes,
+  getReviews,
+} = require("./Controllers/reviews.controllers");
 
 const express = require("express");
 const { getUsers } = require("./Controllers/users.controllers");
 
 const app = express();
 
-app.use(express.json())
+app.use(express.json());
 
 app.get("/api/categories", getCategories);
+
+app.get("/api/reviews?:query", getReviews);
 
 app.get("/api/reviews/:review_id", getReview);
 
 app.get("/api/users", getUsers);
 
-app.patch('/api/reviews/:review_id', patchReviewVotes)
+app.patch("/api/reviews/:review_id", patchReviewVotes);
 
 app.use((req, res, next) => {
   res.status(404).send({ message: "404: invalid end point provided" });

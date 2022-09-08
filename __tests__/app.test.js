@@ -29,6 +29,70 @@ describe("/api/", () => {
     });
   });
   describe("/api/reviews", () => {
+    describe('"/api/reviews', () => {
+      test("200: responds with all reviews if no query is set in descending order", () => {
+        return request(app)
+          .get("/api/reviews")
+          .expect(200)
+          .then((reviews) => {
+            const body = reviews.body;
+
+            const keys = [
+              "review_id",
+              "title",
+              "category",
+              "designer",
+              "owner",
+              "review_body",
+              "review_img_url",
+              "created_at",
+              "votes",
+              "comment_count",
+            ];
+            expect(body.length === 13).toBe(true);
+            body.forEach((review) => {
+              expect(Object.keys(review)).toEqual(keys);
+              expect(body[0].created_at > body[12].created_at).toBe(true);
+            });
+          });
+      });
+      test("200: responds with reviews matching a query in descending date order", () => {
+        return request(app)
+          .get("/api/reviews?category=social deduction")
+          .expect(200)
+          .then((reviews) => {
+            const body = reviews.body;
+
+            const keys = [
+              "review_id",
+              "title",
+              "category",
+              "designer",
+              "owner",
+              "review_body",
+              "review_img_url",
+              "created_at",
+              "votes",
+              "comment_count",
+            ];
+            expect(body.length === 11).toBe(true);
+            body.forEach((review) => {
+              expect(Object.keys(review)).toEqual(keys);
+              expect(body[0].created_at > body[10].created_at).toBe(true);
+            });
+          });
+      });
+      test("404: responds 404 and an error message when passed a query that does not match a category", () => {
+        return request(app)
+          .get("/api/reviews?category=socidfsa")
+          .expect(404)
+          .then((response) => {
+            expect(response.body.message).toEqual(
+              "Sorry, there are no categories matching that query."
+            );
+          });
+      });
+    });
     describe("/api/reviews/:review_id", () => {
       test("200: responds with a review object matching the passed id with a comment count property added", () => {
         return request(app)
