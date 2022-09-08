@@ -49,7 +49,7 @@ describe("/api/", () => {
               expect(review.hasOwnProperty("votes")).toBe(true);
               expect(review.hasOwnProperty("comment_count")).toBe(true);
             });
-            expect(body).toBeSortedBy('created_at', {descending: true})
+            expect(body).toBeSortedBy("created_at", { descending: true });
           });
       });
       test("200: responds with reviews matching a query in descending date order", () => {
@@ -70,20 +70,20 @@ describe("/api/", () => {
               expect(review.hasOwnProperty("created_at")).toBe(true);
               expect(review.hasOwnProperty("votes")).toBe(true);
               expect(review.hasOwnProperty("comment_count")).toBe(true);
-              expect(review.category).toBe('social deduction')
+              expect(review.category).toBe("social deduction");
             });
-            expect(body).toBeSortedBy('created_at', {descending: true})
+            expect(body).toBeSortedBy("created_at", { descending: true });
           });
       });
       test("200: responds with a 200 and an empty array when passed a valid query that has no reviews associated", () => {
         return request(app)
-        .get("/api/reviews?category=children's games")
-        .expect(200)
-        .then((reviews) => {
-          const body = reviews.body.reviews
-          expect(body.length === 0)
-        })
-      })
+          .get("/api/reviews?category=children's games")
+          .expect(200)
+          .then((reviews) => {
+            const body = reviews.body.reviews;
+            expect(body.length === 0);
+          });
+      });
       test("404: responds 404 and an error message when passed a query that does not match a category", () => {
         return request(app)
           .get("/api/reviews?category=socidfsa")
@@ -200,6 +200,48 @@ describe("/api/", () => {
           });
       });
     });
+  });
+});
+describe("/api/reviews/:review_id/comments", () => {
+  test("200: responds with an array of comments associated with the passed id", () => {
+    return request(app)
+      .get("/api/reviews/2/comments")
+      .expect(200)
+      .then((response) => {
+        const expected = [
+          `comment_id`,
+          `body`,
+          `review_id`,
+          `author`,
+          `votes`,
+          `created_at`,
+        ];
+        const body = response.body;
+        expect(body.length === 3).toBe(true);
+        body.forEach((comment) => {
+          expect(Object.keys(comment)).toEqual(expected);
+        });
+      });
+  });
+  test("400: responds with 400 and an error message when passed an invalid id", () => {
+    return request(app)
+      .get("/api/reviews/dsgsd/comments")
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe(
+          "Invalid id provided, a review id must be a number."
+        );
+      });
+  });
+  test("404: responds with 404 and an error message when passed an id that does not exist", () => {
+    return request(app)
+      .get("/api/reviews/9999/comments")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.message).toBe(
+          "Sorry, there is no review with that id. Please try again."
+        );
+      });
   });
 });
 describe("/api/users", () => {
