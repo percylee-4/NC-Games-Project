@@ -35,25 +35,21 @@ describe("/api/", () => {
           .get("/api/reviews")
           .expect(200)
           .then((reviews) => {
-            const body = reviews.body;
-
-            const keys = [
-              "review_id",
-              "title",
-              "category",
-              "designer",
-              "owner",
-              "review_body",
-              "review_img_url",
-              "created_at",
-              "votes",
-              "comment_count",
-            ];
+            const body = reviews.body.reviews;
             expect(body.length === 13).toBe(true);
             body.forEach((review) => {
-              expect(Object.keys(review)).toEqual(keys);
-              expect(body[0].created_at > body[12].created_at).toBe(true);
+              expect(review.hasOwnProperty("review_id")).toBe(true);
+              expect(review.hasOwnProperty("title")).toBe(true);
+              expect(review.hasOwnProperty("category")).toBe(true);
+              expect(review.hasOwnProperty("designer")).toBe(true);
+              expect(review.hasOwnProperty("owner")).toBe(true);
+              expect(review.hasOwnProperty("review_body")).toBe(true);
+              expect(review.hasOwnProperty("review_img_url")).toBe(true);
+              expect(review.hasOwnProperty("created_at")).toBe(true);
+              expect(review.hasOwnProperty("votes")).toBe(true);
+              expect(review.hasOwnProperty("comment_count")).toBe(true);
             });
+            expect(body).toBeSortedBy('created_at', {descending: true})
           });
       });
       test("200: responds with reviews matching a query in descending date order", () => {
@@ -61,27 +57,33 @@ describe("/api/", () => {
           .get("/api/reviews?category=social deduction")
           .expect(200)
           .then((reviews) => {
-            const body = reviews.body;
-
-            const keys = [
-              "review_id",
-              "title",
-              "category",
-              "designer",
-              "owner",
-              "review_body",
-              "review_img_url",
-              "created_at",
-              "votes",
-              "comment_count",
-            ];
+            const body = reviews.body.reviews;
             expect(body.length === 11).toBe(true);
             body.forEach((review) => {
-              expect(Object.keys(review)).toEqual(keys);
-              expect(body[0].created_at > body[10].created_at).toBe(true);
+              expect(review.hasOwnProperty("review_id")).toBe(true);
+              expect(review.hasOwnProperty("title")).toBe(true);
+              expect(review.hasOwnProperty("category")).toBe(true);
+              expect(review.hasOwnProperty("designer")).toBe(true);
+              expect(review.hasOwnProperty("owner")).toBe(true);
+              expect(review.hasOwnProperty("review_body")).toBe(true);
+              expect(review.hasOwnProperty("review_img_url")).toBe(true);
+              expect(review.hasOwnProperty("created_at")).toBe(true);
+              expect(review.hasOwnProperty("votes")).toBe(true);
+              expect(review.hasOwnProperty("comment_count")).toBe(true);
+              expect(review.category).toBe('social deduction')
             });
+            expect(body).toBeSortedBy('created_at', {descending: true})
           });
       });
+      test("200: responds with a 200 and an empty array when passed a valid query that has no reviews associated", () => {
+        return request(app)
+        .get("/api/reviews?category=children's games")
+        .expect(200)
+        .then((reviews) => {
+          const body = reviews.body.reviews
+          expect(body.length === 0)
+        })
+      })
       test("404: responds 404 and an error message when passed a query that does not match a category", () => {
         return request(app)
           .get("/api/reviews?category=socidfsa")

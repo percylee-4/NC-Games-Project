@@ -44,21 +44,25 @@ exports.selectReviews = (query) => {
   const queryStatement = " WHERE reviews.category = $1";
   const groupOrder = ` GROUP BY comments.review_id, reviews.review_id ORDER BY created_at DESC`;
 
-  if (typeof query === "string") {
+  if (query === undefined) {
+    return db.query(selectJoin + groupOrder).then((reviews) => {
+      return reviews.rows;
+    });
+  }
+  if (query !== undefined)
     return db
-      .query(selectJoin + queryStatement + groupOrder, [query])
-      .then((review) => {
-        if (review.rows.length === 0) {
+      .query("SELECT * FROM categories WHERE slug = $1", [query])
+      .then((response) => {
+        if (response.rows.length === 0) {
           return Promise.reject({
             status: 404,
             message: "Sorry, there are no categories matching that query.",
           });
         }
-        return review.rows;
+        return db
+          .query(selectJoin + queryStatement + groupOrder, [query])
+          .then((review) => {
+            return review.rows;
+          });
       });
-  } else {
-    return db.query(selectJoin + groupOrder).then((reviews) => {
-      return reviews.rows;
-    });
-  }
 };
