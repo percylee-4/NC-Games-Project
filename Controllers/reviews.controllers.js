@@ -55,7 +55,7 @@ exports.getComments = (req, res, next) => {
   const id = req.params.review_id;
   selectComments(id)
     .then((comments) => {
-      res.status(200).send(comments);
+      res.status(200).send({comments: comments});
     })
     .catch((err) => {
       if (err.code === "22P02") {
@@ -63,7 +63,8 @@ exports.getComments = (req, res, next) => {
           status: 400,
           message: "Invalid id provided, a review id must be a number.",
         });
+      } else {
+        next(err);
       }
-      next(err);
     });
 };

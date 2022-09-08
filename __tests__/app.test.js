@@ -202,24 +202,21 @@ describe("/api/", () => {
     });
   });
 });
-describe("/api/reviews/:review_id/comments", () => {
+describe.only("/api/reviews/:review_id/comments", () => {
   test("200: responds with an array of comments associated with the passed id", () => {
     return request(app)
       .get("/api/reviews/2/comments")
       .expect(200)
       .then((response) => {
-        const expected = [
-          `comment_id`,
-          `body`,
-          `review_id`,
-          `author`,
-          `votes`,
-          `created_at`,
-        ];
-        const body = response.body;
+        const body = response.body.comments;
         expect(body.length === 3).toBe(true);
         body.forEach((comment) => {
-          expect(Object.keys(comment)).toEqual(expected);
+          expect(comment.hasOwnProperty('comment_id')).toEqual(true);
+          expect(comment.hasOwnProperty('body')).toEqual(true);
+          expect(comment.hasOwnProperty('review_id')).toEqual(true);
+          expect(comment.hasOwnProperty('author')).toEqual(true);
+          expect(comment.hasOwnProperty('votes')).toEqual(true);
+          expect(comment.hasOwnProperty('created_at')).toEqual(true);
         });
       });
   });
