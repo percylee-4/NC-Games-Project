@@ -211,13 +211,13 @@ describe("/api/reviews/:review_id/comments", () => {
         const body = response.body.comments;
         expect(body.length === 3).toBe(true);
         body.forEach((comment) => {
-          expect(comment.hasOwnProperty('comment_id')).toEqual(true);
-          expect(comment.hasOwnProperty('body')).toEqual(true);
-          expect(comment.hasOwnProperty('review_id')).toEqual(true);
-          expect(comment.hasOwnProperty('author')).toEqual(true);
-          expect(comment.hasOwnProperty('votes')).toEqual(true);
-          expect(comment.hasOwnProperty('created_at')).toEqual(true);
-          expect(comment.review_id).toBe(2)
+          expect(comment.hasOwnProperty("comment_id")).toEqual(true);
+          expect(comment.hasOwnProperty("body")).toEqual(true);
+          expect(comment.hasOwnProperty("review_id")).toEqual(true);
+          expect(comment.hasOwnProperty("author")).toEqual(true);
+          expect(comment.hasOwnProperty("votes")).toEqual(true);
+          expect(comment.hasOwnProperty("created_at")).toEqual(true);
+          expect(comment.review_id).toBe(2);
         });
       });
   });
@@ -242,6 +242,47 @@ describe("/api/reviews/:review_id/comments", () => {
       });
   });
 });
+describe("/api/reviews/:review_id/comments", () => {
+  test("201: responds with the posted comment", () => {
+    const post = {
+      username: "mallionaire",
+      body: "Percy loves playing chess.",
+    };
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send(post)
+      .expect(201)
+      .then((response) => {
+        const comment = response.body.comment[0];
+        expect(comment.hasOwnProperty("comment_id")).toBe(true);
+        expect(comment.hasOwnProperty("body")).toBe(true);
+        expect(comment.hasOwnProperty("review_id")).toBe(true);
+        expect(comment.hasOwnProperty("author")).toBe(true);
+        expect(comment.hasOwnProperty("votes")).toBe(true);
+        expect(comment.hasOwnProperty("created_at")).toBe(true);
+        expect(comment.review_id).toBe(2);
+        expect(comment.author).toBe("mallionaire");
+        expect(comment.body).toBe("Percy loves playing chess.");
+        expect(comment.comment_id).toBe(7);
+      });
+  });
+  test("404: responds with 404 and an error message when passed a review id that does not exist", () => {
+    const post = {
+      username: "mallionaire",
+      body: "Percy loves playing chess.",
+    };
+    return request(app)
+      .post("/api/reviews/999/comments")
+      .send(post)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.message).toBe(
+          "Sorry, there is no review with that id. Please try again."
+        );
+      });
+  });
+});
+
 describe("/api/users", () => {
   test("200: returns an array of user objects", () => {
     return request(app)
