@@ -202,7 +202,7 @@ describe("/api/", () => {
     });
   });
 });
-describe.only("/api/reviews/:review_id/comments", () => {
+describe("/api/reviews/:review_id/comments", () => {
   test("200: responds with an array of comments associated with the passed id", () => {
     return request(app)
       .get("/api/reviews/2/comments")
@@ -217,6 +217,7 @@ describe.only("/api/reviews/:review_id/comments", () => {
           expect(comment.hasOwnProperty('author')).toEqual(true);
           expect(comment.hasOwnProperty('votes')).toEqual(true);
           expect(comment.hasOwnProperty('created_at')).toEqual(true);
+          expect(comment.review_id).toBe(2)
         });
       });
   });
