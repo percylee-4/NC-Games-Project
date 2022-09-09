@@ -91,7 +91,7 @@ exports.postComment = (req, res, next) => {
       } else if (err.code === "22P02"){
         next({
           status:400,
-          message: "Sorry, there is no review with that id. Please try again."
+          message:"Sorry, that review id is invalid, please enter a number."
         })
       } else {
         next(err);

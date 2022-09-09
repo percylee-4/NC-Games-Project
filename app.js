@@ -9,6 +9,7 @@ const {
 
 const express = require("express");
 const { getUsers } = require("./Controllers/users.controllers");
+const { removeComment } = require("./Controllers/comments.controllers");
 
 const app = express();
 
@@ -27,6 +28,8 @@ app.post("/api/reviews/:review_id/comments", postComment);
 app.get("/api/users", getUsers);
 
 app.patch("/api/reviews/:review_id", patchReviewVotes);
+
+app.delete("/api/comments/:comment_id", removeComment);
 
 app.use((req, res, next) => {
   res.status(404).send({ message: "404: invalid end point provided" });
