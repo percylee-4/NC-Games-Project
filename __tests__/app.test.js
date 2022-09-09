@@ -325,7 +325,7 @@ test("400: responds with a 400 when id is not valid", () => {
   .send(post)
   .expect(400)
   .then((response) => {
-    expect(response.body.message).toBe("Sorry, there is no review with that id. Please try again.")
+    expect(response.body.message).toBe("Sorry, that review id is invalid, please enter a number.")
   })
 
 })
