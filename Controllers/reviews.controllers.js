@@ -88,6 +88,11 @@ exports.postComment = (req, res, next) => {
           status: 404,
           message: "Sorry, there is no review with that id. Please try again.",
         });
+      } else if (err.code === "22P02"){
+        next({
+          status:400,
+          message: "Sorry, there is no review with that id. Please try again."
+        })
       } else {
         next(err);
       }

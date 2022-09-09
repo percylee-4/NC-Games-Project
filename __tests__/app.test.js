@@ -315,6 +315,21 @@ describe("/api/reviews/:review_id/comments", () => {
 
   })
 });
+test("400: responds with a 400 when id is not valid", () => {
+  const post = {
+    username: "mallionaire",
+    body: "likes cheddar cheese",
+  };
+  return request(app)
+  .post("/api/reviews/dog/comments")
+  .send(post)
+  .expect(400)
+  .then((response) => {
+    expect(response.body.message).toBe("Sorry, there is no review with that id. Please try again.")
+  })
+
+})
+
 
 describe("/api/users", () => {
   test("200: returns an array of user objects", () => {
