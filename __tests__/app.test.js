@@ -360,3 +360,20 @@ describe("404: mispelt url path", () => {
       });
   });
 })
+describe('/api/comments', () => {
+  describe('/api/comments/:comment_id', () => {
+    test('204: responds with a 204', () => {
+      return request(app)
+      .delete('/api/comments/2')
+      .expect(204)
+      .then(() => {
+        return db.query('SELECT * FROM comments')
+        .then((response) => {
+          expect(response.rows.length === 5).toBe(true)
+          expect(response.rows[1].comment_id).toBe(3)
+        })
+      })
+    })
+  });
+  
+});
