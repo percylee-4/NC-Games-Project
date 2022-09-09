@@ -255,20 +255,23 @@ describe("/api/reviews/:review_id/comments", () => {
       .expect(201)
       .then((response) => {
         const comment = response.body.comment[0];
-       const expected = {
+        const expected = {
           comment_id: 7,
-          body: 'Percy loves playing chess.',
+          body: "Percy loves playing chess.",
           review_id: 2,
-          author: 'mallionaire',
+          author: "mallionaire",
           votes: 0,
-          created_at: expect.any(String)
-        }
-        expect(comment).toEqual(expected)
-        expect(/\d\d\d\d-\d\d-\d\dT/.test(comment.created_at)).toBe(true)
-        return db.query('SELECT * FROM comments').then((response) => {
-          expect(response.rows.length === 7).toBe(true)
-          expect(response.rows[6]).toHaveProperty("body", "Percy loves playing chess.")
-        })
+          created_at: expect.any(String),
+        };
+        expect(comment).toEqual(expected);
+        expect(/\d\d\d\d-\d\d-\d\dT/.test(comment.created_at)).toBe(true);
+        return db.query("SELECT * FROM comments").then((response) => {
+          expect(response.rows.length === 7).toBe(true);
+          expect(response.rows[6]).toHaveProperty(
+            "body",
+            "Percy loves playing chess."
+          );
+        });
       });
   });
   test("404: responds with 404 and an error message when passed a review id that does not exist", () => {
@@ -292,28 +295,30 @@ describe("/api/reviews/:review_id/comments", () => {
       body: "",
     };
     return request(app)
-    .post("/api/reviews/2/comments")
-    .send(post)
-    .expect(400)
-    .then((response) => {
-      expect(response.body.message).toBe("Invalid request. Comment must include a body.")
-    })
-
-  })
+      .post("/api/reviews/2/comments")
+      .send(post)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe(
+          "Invalid request. Comment must include a body."
+        );
+      });
+  });
   test("400: responds with a 400 when user is not valid", () => {
     const post = {
       username: "Pursea",
       body: "likes cheddar cheese",
     };
     return request(app)
-    .post("/api/reviews/2/comments")
-    .send(post)
-    .expect(400)
-    .then((response) => {
-      expect(response.body.message).toBe("You must create an account in order to make a comment!")
-    })
-
-  })
+      .post("/api/reviews/2/comments")
+      .send(post)
+      .expect(400)
+      .then((response) => {
+        expect(response.body.message).toBe(
+          "You must create an account in order to make a comment!"
+        );
+      });
+  });
 });
 test("400: responds with a 400 when id is not valid", () => {
   const post = {
@@ -321,15 +326,15 @@ test("400: responds with a 400 when id is not valid", () => {
     body: "likes cheddar cheese",
   };
   return request(app)
-  .post("/api/reviews/dog/comments")
-  .send(post)
-  .expect(400)
-  .then((response) => {
-    expect(response.body.message).toBe("Sorry, that review id is invalid, please enter a number.")
-  })
-
-})
-
+    .post("/api/reviews/dog/comments")
+    .send(post)
+    .expect(400)
+    .then((response) => {
+      expect(response.body.message).toBe(
+        "Sorry, that review id is invalid, please enter a number."
+      );
+    });
+});
 
 describe("/api/users", () => {
   test("200: returns an array of user objects", () => {
@@ -359,21 +364,29 @@ describe("404: mispelt url path", () => {
         });
       });
   });
-})
-describe('/api/comments', () => {
-  describe('/api/comments/:comment_id', () => {
-    test('204: responds with a 204', () => {
+});
+describe("/api/comments", () => {
+  describe("/api/comments/:comment_id", () => {
+    test("204: responds with a 204", () => {
       return request(app)
-      .delete('/api/comments/2')
-      .expect(204)
-      .then(() => {
-        return db.query('SELECT * FROM comments')
+        .delete("/api/comments/2")
+        .expect(204)
+        .then(() => {
+          return db.query("SELECT * FROM comments").then((response) => {
+            expect(response.rows.length === 5).toBe(true);
+            expect(response.rows[1].comment_id).toBe(3);
+          });
+        });
+    });
+    test("400: responds with 400 when passed an invalid comment_id", () => {
+      return request(app)
+        .delete("/api/comments/banana")
+        .expect(400)
         .then((response) => {
-          expect(response.rows.length === 5).toBe(true)
-          expect(response.rows[1].comment_id).toBe(3)
-        })
-      })
-    })
+          expect(response.body.message).toBe(
+            "Sorry, that comment id is invalid, please enter a number."
+          );
+        });
+    });
   });
-  
 });
