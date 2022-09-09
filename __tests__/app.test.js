@@ -4,6 +4,7 @@ const db = require("../db/connection");
 
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
+const { string } = require("pg-format");
 
 beforeEach(() => {
   return seed(testData);
@@ -211,13 +212,13 @@ describe("/api/reviews/:review_id/comments", () => {
         const body = response.body.comments;
         expect(body.length === 3).toBe(true);
         body.forEach((comment) => {
-          expect(comment.hasOwnProperty('comment_id')).toEqual(true);
-          expect(comment.hasOwnProperty('body')).toEqual(true);
-          expect(comment.hasOwnProperty('review_id')).toEqual(true);
-          expect(comment.hasOwnProperty('author')).toEqual(true);
-          expect(comment.hasOwnProperty('votes')).toEqual(true);
-          expect(comment.hasOwnProperty('created_at')).toEqual(true);
-          expect(comment.review_id).toBe(2)
+          expect(comment.hasOwnProperty("comment_id")).toEqual(true);
+          expect(comment.hasOwnProperty("body")).toEqual(true);
+          expect(comment.hasOwnProperty("review_id")).toEqual(true);
+          expect(comment.hasOwnProperty("author")).toEqual(true);
+          expect(comment.hasOwnProperty("votes")).toEqual(true);
+          expect(comment.hasOwnProperty("created_at")).toEqual(true);
+          expect(comment.review_id).toBe(2);
         });
       });
   });
@@ -242,6 +243,94 @@ describe("/api/reviews/:review_id/comments", () => {
       });
   });
 });
+describe("/api/reviews/:review_id/comments", () => {
+  test("201: responds with the posted comment", () => {
+    const post = {
+      username: "mallionaire",
+      body: "Percy loves playing chess.",
+    };
+    return request(app)
+      .post("/api/reviews/2/comments")
+      .send(post)
+      .expect(201)
+      .then((response) => {
+        const comment = response.body.comment[0];
+       const expected = {
+          comment_id: 7,
+          body: 'Percy loves playing chess.',
+          review_id: 2,
+          author: 'mallionaire',
+          votes: 0,
+          created_at: expect.any(String)
+        }
+        expect(comment).toEqual(expected)
+        expect(/\d\d\d\d-\d\d-\d\dT/.test(comment.created_at)).toBe(true)
+        return db.query('SELECT * FROM comments').then((response) => {
+          expect(response.rows.length === 7).toBe(true)
+          expect(response.rows[6]).toHaveProperty("body", "Percy loves playing chess.")
+        })
+      });
+  });
+  test("404: responds with 404 and an error message when passed a review id that does not exist", () => {
+    const post = {
+      username: "mallionaire",
+      body: "Percy loves playing chess.",
+    };
+    return request(app)
+      .post("/api/reviews/999/comments")
+      .send(post)
+      .expect(404)
+      .then((response) => {
+        expect(response.body.message).toBe(
+          "Sorry, there is no review with that id. Please try again."
+        );
+      });
+  });
+  test("400: responds with a 400 when no body is attached", () => {
+    const post = {
+      username: "mallionaire",
+      body: "",
+    };
+    return request(app)
+    .post("/api/reviews/2/comments")
+    .send(post)
+    .expect(400)
+    .then((response) => {
+      expect(response.body.message).toBe("Invalid request. Comment must include a body.")
+    })
+
+  })
+  test("400: responds with a 400 when user is not valid", () => {
+    const post = {
+      username: "Pursea",
+      body: "likes cheddar cheese",
+    };
+    return request(app)
+    .post("/api/reviews/2/comments")
+    .send(post)
+    .expect(400)
+    .then((response) => {
+      expect(response.body.message).toBe("You must create an account in order to make a comment!")
+    })
+
+  })
+});
+test("400: responds with a 400 when id is not valid", () => {
+  const post = {
+    username: "mallionaire",
+    body: "likes cheddar cheese",
+  };
+  return request(app)
+  .post("/api/reviews/dog/comments")
+  .send(post)
+  .expect(400)
+  .then((response) => {
+    expect(response.body.message).toBe("Sorry, that review id is invalid, please enter a number.")
+  })
+
+})
+
+
 describe("/api/users", () => {
   test("200: returns an array of user objects", () => {
     return request(app)
@@ -270,4 +359,4 @@ describe("404: mispelt url path", () => {
         });
       });
   });
-});
+})
