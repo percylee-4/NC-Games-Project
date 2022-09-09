@@ -78,7 +78,12 @@ exports.postComment = (req, res, next) => {
       res.status(201).send({ comment: comment });
     })
     .catch((err) => {
-      if (err.code === "23503") {
+      if (err.constraint === "comments_author_fkey") {
+        next({
+          status: 400,
+          message: "You must create an account in order to make a comment!",
+        });
+      } else if (err.code === "23503") {
         next({
           status: 404,
           message: "Sorry, there is no review with that id. Please try again.",

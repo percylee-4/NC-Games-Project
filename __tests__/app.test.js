@@ -4,6 +4,7 @@ const db = require("../db/connection");
 
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
+const { string } = require("pg-format");
 
 beforeEach(() => {
   return seed(testData);
@@ -254,16 +255,20 @@ describe("/api/reviews/:review_id/comments", () => {
       .expect(201)
       .then((response) => {
         const comment = response.body.comment[0];
-        expect(comment.hasOwnProperty("comment_id")).toBe(true);
-        expect(comment.hasOwnProperty("body")).toBe(true);
-        expect(comment.hasOwnProperty("review_id")).toBe(true);
-        expect(comment.hasOwnProperty("author")).toBe(true);
-        expect(comment.hasOwnProperty("votes")).toBe(true);
-        expect(comment.hasOwnProperty("created_at")).toBe(true);
-        expect(comment.review_id).toBe(2);
-        expect(comment.author).toBe("mallionaire");
-        expect(comment.body).toBe("Percy loves playing chess.");
-        expect(comment.comment_id).toBe(7);
+       const expected = {
+          comment_id: 7,
+          body: 'Percy loves playing chess.',
+          review_id: 2,
+          author: 'mallionaire',
+          votes: 0,
+          created_at: expect.any(String)
+        }
+        expect(comment).toEqual(expected)
+        expect(/\d\d\d\d-\d\d-\d\dT/.test(comment.created_at)).toBe(true)
+        return db.query('SELECT * FROM comments').then((response) => {
+          expect(response.rows.length === 7).toBe(true)
+          expect(response.rows[6]).toHaveProperty("body", "Percy loves playing chess.")
+        })
       });
   });
   test("404: responds with 404 and an error message when passed a review id that does not exist", () => {
@@ -281,6 +286,34 @@ describe("/api/reviews/:review_id/comments", () => {
         );
       });
   });
+  test("400: responds with a 400 when no body is attached", () => {
+    const post = {
+      username: "mallionaire",
+      body: "",
+    };
+    return request(app)
+    .post("/api/reviews/2/comments")
+    .send(post)
+    .expect(400)
+    .then((response) => {
+      expect(response.body.message).toBe("Invalid request. Comment must include a body.")
+    })
+
+  })
+  test("400: responds with a 400 when user is not valid", () => {
+    const post = {
+      username: "Pursea",
+      body: "likes cheddar cheese",
+    };
+    return request(app)
+    .post("/api/reviews/2/comments")
+    .send(post)
+    .expect(400)
+    .then((response) => {
+      expect(response.body.message).toBe("You must create an account in order to make a comment!")
+    })
+
+  })
 });
 
 describe("/api/users", () => {
@@ -311,4 +344,4 @@ describe("404: mispelt url path", () => {
         });
       });
   });
-});
+})

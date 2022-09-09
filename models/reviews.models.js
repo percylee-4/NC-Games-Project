@@ -82,12 +82,19 @@ exports.selectComments = (id) => {
 };
 
 exports.insertComment = (id, body) => {
-  return db
-    .query(
-      `INSERT INTO comments (review_id, author, body) VALUES ($1, $2, $3) RETURNING *`,
-      [id, body.username, body.body]
-    )
-    .then((response) => {
-      return response.rows;
+  if (!body.body || !body.username) {
+    return Promise.reject({
+      status: 400,
+      message: "Invalid request. Comment must include a body.",
     });
+  } else {
+    return db
+      .query(
+        `INSERT INTO comments (review_id, author, body) VALUES ($1, $2, $3) RETURNING *`,
+        [id, body.username, body.body]
+      )
+      .then((response) => {
+        return response.rows;
+      });
+  }
 };
